@@ -16,7 +16,7 @@ namespace API.Data
 
             {
                 
-                 new Product
+                new Product
                 {
                     Name = "Angular Speedster Board 2000",
                     Description =
@@ -223,4 +223,3 @@ namespace API.Data
         }
     }
 }
-    
