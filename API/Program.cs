@@ -1,4 +1,5 @@
 using API.Data;
+using API.middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,33 +12,34 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddDbContext<StoreContext>(opt=>
+builder.Services.AddDbContext<StoreContext>(opt =>
     {
         opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
 
-    builder.Services.AddCors();
+builder.Services.AddCors();
 
-    var app     = builder.Build();
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
-    var logger  = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+var app = builder.Build();
+using var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    try{
-        context.Database.Migrate();
-        DbInitializer.Initialize(context);
-    }catch(Exception ex)
+try
+{
+    context.Database.Migrate();
+    DbInitializer.Initialize(context);
+}
+catch (Exception ex)
 
-    {
-        logger.LogError(ex,"Problem migrating data");
-    }
-  
-     //app.Run();
+{
+    logger.LogError(ex, "Problem migrating data");
+}
 
+
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -46,7 +48,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 
-app.UseCors(opt => 
+app.UseCors(opt =>
     {
         opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
     });
