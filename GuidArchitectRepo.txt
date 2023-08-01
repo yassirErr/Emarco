@@ -1,0 +1,4 @@
+1-Create Iinterface => IProductRepository
+2-Create ClassRepository => ProductRepository
+3-implement IProductRepository  into IUnitOfWork 
+4-initialise ProductRepository
